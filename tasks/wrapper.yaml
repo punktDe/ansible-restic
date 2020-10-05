@@ -1,0 +1,11 @@
+- name: Template Restic wrapper scripts
+  vars:
+    dest: "{{ restic.prefix.bin }}/restic-{{ item.key }}"
+    restic_config: "{{ item.value }}"
+  loop: "{{ restic.config|dict2items }}"
+  loop_control:
+    label: "{{ dest }}"
+  template:
+    src: restic/restic-wrapper
+    dest: "{{ dest }}"
+    mode: 0700

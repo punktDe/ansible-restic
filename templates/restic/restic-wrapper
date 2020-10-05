@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -e -u -o pipefail
+
+export RESTIC_CACHE_DIR={{ restic.prefix.cache|quote }}
+{% for variable, value in (restic_config.environment|default({})).items() %}
+export {{ variable }}={{ value|quote }}
+{% endfor %}
+
+exec restic "$@"

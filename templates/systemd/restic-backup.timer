@@ -1,0 +1,5 @@
+[Timer]
+{{ restic_config.timer|default('', true) }}
+
+[Install]
+WantedBy=timers.target

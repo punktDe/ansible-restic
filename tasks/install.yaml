@@ -1,0 +1,11 @@
+- name: Install Restic
+  when: ansible_distribution == 'Ubuntu'
+  apt:
+    name: restic
+
+- name: Create directories for Restic
+  loop:
+    - "{{ restic.prefix.bin }}"
+  file:
+    path: "{{ item }}"
+    state: directory

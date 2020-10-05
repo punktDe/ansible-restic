@@ -1,0 +1,10 @@
+restic:
+  prefix:
+    bin: >-
+      {%- if ansible_system == 'Linux' -%}
+        /usr/local/bin
+      {%- else -%}
+        /var/opt/restic/bin
+      {%- endif -%}
+    cache: /var/cache/restic
+  config: {}
