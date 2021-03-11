@@ -1,7 +1,9 @@
-- name: Install Restic
+- name: Install Restic and jq
   when: ansible_distribution == 'Ubuntu'
   apt:
-    name: restic
+    name:
+      - restic
+      - jq
 
 - name: Create directories for Restic
   loop:

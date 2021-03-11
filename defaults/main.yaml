@@ -8,3 +8,5 @@ restic:
       {%- endif -%}
     cache: /var/cache/restic
   config: {}
+  send_application_events: no
+  application_event_log: /var/log/application_events/Restic-Backup-%config%.log

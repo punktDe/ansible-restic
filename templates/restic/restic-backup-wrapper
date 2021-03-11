@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+set -e -u -o pipefail
+
+{% if restic.send_application_events %}
+json_escape() {
+    printf '%s' "$1" | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))'
+}
+
+application_event_open() {
+    echo -n '{"metrics": [' > "$application_event_log_tmp"
+}
+
+application_event_add_metric() {
+    echo -n '{"identifier": '"$(json_escape "$1")"', "value": '"$2"'}, ' >> "$application_event_log_tmp"
+}
+
+application_event_set_success() {
+    echo -n '{"identifier": "success", "value": '"$1"'}]' >> "$application_event_log_tmp"
+}
+
+application_event_set_message() {
+    echo -n ', "message": '"$(json_escape "$1")"'' >> "$application_event_log_tmp"
+}
+
+application_event_close() {
+    echo ', "timestamp": "'"$(date --iso-8601=s)"'"}' >> "$application_event_log_tmp"
+    cat -- "$application_event_log_tmp" >> "$application_event_log"
+    rm -- "$application_event_log_tmp"
+}
+
+application_event_log={{ restic.application_event_log|replace('%config%', restic_config_name)|quote }}
+application_event_log_tmp="$(mktemp)"
+application_event_open
+{% endif %}
+
+{{ restic.prefix.bin }}/restic-{{ restic_config_name }} init || :
+restic_backup_run() {
+    {{ restic.prefix.bin }}/restic-{{ restic_config_name }} backup{% if restic.send_application_events %} --json{% endif %}{% for option, value in (restic_config.backup_opts|default({})).items()|selectattr('1', 'ne', none) %} --{{ option|quote }}={{ value|quote }}{% endfor %}{% for argument in ((restic_config.backup_args|default({})).items()|sort(attribute='0'))|map(attribute='1')|select('ne', none) %} {{ argument|quote }}{% endfor %}
+
+}
+{% if restic.send_application_events %}
+restic_backup_result="$(restic_backup_run | jq -c '.|select(.message_type=="summary")' | tail -n 1)"
+{% else %}
+restic_backup_run
+{% endif %}
+restic_backup_rc=$?
+
+{% if restic.send_application_events %}
+application_event_add_metric time $SECONDS
+application_event_add_metric files_new "$(jq .files_new <<<"$restic_backup_result")"
+application_event_add_metric files_changed "$(jq .files_changed <<<"$restic_backup_result")"
+application_event_add_metric files_unmodified "$(jq .files_unmodified <<<"$restic_backup_result")"
+application_event_add_metric dirs_new "$(jq .dirs_new <<<"$restic_backup_result")"
+application_event_add_metric dirs_changed "$(jq .dirs_changed <<<"$restic_backup_result")"
+application_event_add_metric dirs_unmodified "$(jq .dirs_unmodified <<<"$restic_backup_result")"
+application_event_add_metric data_blobs "$(jq .data_blobs <<<"$restic_backup_result")"
+application_event_add_metric tree_blobs "$(jq .tree_blobs <<<"$restic_backup_result")"
+application_event_add_metric data_added "$(jq .data_added <<<"$restic_backup_result")"
+application_event_add_metric total_files_processed "$(jq .total_files_processed <<<"$restic_backup_result")"
+application_event_add_metric total_bytes_processed "$(jq .total_bytes_processed <<<"$restic_backup_result")"
+application_event_set_success $(($restic_backup_rc == 0))
+application_event_set_message ""
+application_event_close
+{% endif %}
+
+{% if restic.send_application_events %}
+printf "%s\n" "$restic_backup_result"
+{% endif %}
+exit $restic_backup_rc
