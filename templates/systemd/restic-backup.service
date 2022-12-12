@@ -1,3 +1,4 @@
 [Service]
 Type=oneshot
 ExecStart={{ restic.prefix.bin }}/restic-backup-{{ item.key }}
+ExecStartPre={{ restic.prefix.bin }}/restic-{{ item.key }} unlock
