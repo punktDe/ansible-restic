@@ -1,4 +1,7 @@
 restic:
+  cache_cleanup:
+    enabled: no
+    delete_older_than: # days
   prefix:
     bin: >-
       {%- if ansible_system == 'Linux' -%}

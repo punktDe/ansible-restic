@@ -1,0 +1,2 @@
+#!/bin/sh
+find ~/.cache/restic/ -atime +{{ restic.cache_cleanup.delete_older_than }} | xargs rm

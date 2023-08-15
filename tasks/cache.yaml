@@ -1,0 +1,25 @@
+- name: Template restic-cache-cleanup script
+  ansible.builtin.template:
+    src: cache/restic-cache-cleanup
+    dest: "/usr/local/bin/restic-cache-cleanup"
+    mode: a-rwx,u+rwx
+    trim_blocks: no
+
+- name: Template the restic cache cleanup service
+  loop:
+    - /etc/systemd/system/restic-cache-cleanup.service
+    - /etc/systemd/system/restic-cache-cleanup.timer
+  ansible.builtin.template:
+    src: "cache/{{ item | basename }}"
+    dest: "{{ item }}"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Enable and start restic-cache-cleanup systemd timer
+  when: not ansible_check_mode
+  ansible.builtin.systemd:
+    daemon_reload: yes
+    name: restic-cache-cleanup.timer
+    enabled: yes
+    state: started
