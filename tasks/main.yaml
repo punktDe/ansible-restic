@@ -5,11 +5,11 @@
   ansible.builtin.include_tasks: wrapper.yaml
 
 - name: Install restic systemd service
-  when: 'ansible_system = "Linux"'
+  when: 'ansible_system == "Linux"'
   ansible.builtin.include_tasks: systemd.yaml
 
 - name: Install restic cache cleanup service
   when: 
-    - 'ansible_system = "Linux"'
+    - 'ansible_system == "Linux"'
     - restic.cache_cleanup.enabled
   ansible.builtin.include_tasks: cache.yaml
