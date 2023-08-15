@@ -13,7 +13,7 @@
     src: "cache/{{ item | basename }}"
     dest: "{{ item }}"
     owner: root
-    group: root
+    group: "{{ root_group }}"
     mode: "0644"
 
 - name: Enable and start restic-cache-cleanup systemd timer

@@ -1,5 +1,15 @@
-- import_tasks: install.yaml
-- import_tasks: wrapper.yaml
-- import_tasks: systemd.yaml
-- import_tasks: cache.yaml
-  when: restic.cache_cleanup.enabled
+- name: Install restic
+  ansible.builtin.include_tasks: install.yaml
+
+- name: Install restic wrapper
+  ansible.builtin.include_tasks: wrapper.yaml
+
+- name: Install restic systemd service
+  when: ansible_system = "Linux"
+  ansible.builtin.include_tasks: systemd.yaml
+
+- name: Install restic cache cleanup service
+  when: 
+    - ansible_system = "Linux"
+    - restic.cache_cleanup.enabled
+  ansible.builtin.include_tasks: cache.yaml

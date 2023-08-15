@@ -1,3 +1,9 @@
+root_group: >-
+  {%- if ansible_os_family == 'Debian' -%}
+    root
+  {%- else -%}
+    wheel
+  {%- endif -%}
 restic:
   cache_cleanup:
     enabled: no

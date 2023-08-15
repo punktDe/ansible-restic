@@ -8,7 +8,9 @@
     restic_config: "{{ restic.config[item.1] }}"
   loop_control:
     label: "{{ dest }}"
-  template:
+  ansible.builtin.template:
     src: "restic/{{ item.0 }}-wrapper"
     dest: "{{ dest }}"
     mode: 0700
+    owner: root
+    group: "{{ root_group }}"
