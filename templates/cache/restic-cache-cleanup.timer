@@ -1,0 +1,5 @@
+[Timer]
+OnCalendar={{ restic.cache_cleanup.schedule }}
+
+[Install]
+WantedBy=timers.target
