@@ -1,6 +1,7 @@
 - name: Install Restic and jq
   when: ansible_os_family == 'Debian'
   ansible.builtin.apt:
+    update_cache: yes
     name:
       - restic
       - jq
