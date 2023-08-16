@@ -6,6 +6,7 @@ root_group: >-
   {%- endif -%}
 restic:
   cache_cleanup:
+    schedule: "*-*-* 06:21:00"
     enabled: no
     delete_older_than: # days
   prefix:
