@@ -1,0 +1,8 @@
+---
+galaxy_info:
+  author: "Punkt.de"
+  license: ""
+  description: "Restic role"
+  role_name: "proserver_restic"
+  namespace: "punktde"
+  min_ansible_version: "2.15"
