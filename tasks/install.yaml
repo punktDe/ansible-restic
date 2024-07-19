@@ -1,6 +1,7 @@
 - name: Install Restic and jq
-  when: ansible_distribution == 'Ubuntu'
-  apt:
+  when: ansible_os_family == 'Debian'
+  ansible.builtin.apt:
+    update_cache: yes
     name:
       - restic
       - jq
@@ -8,6 +9,9 @@
 - name: Create directories for Restic
   loop:
     - "{{ restic.prefix.bin }}"
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     state: directory
+    owner: root
+    group: "{{ root_group }}"
+    mode: "0755"

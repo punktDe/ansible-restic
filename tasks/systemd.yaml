@@ -2,28 +2,34 @@
   vars:
     dest: "/etc/systemd/system/restic-backup-{{ item.key }}.service"
     restic_config: "{{ item.value }}"
-  loop: "{{ restic.config|dict2items }}"
+  loop: "{{ restic.config | dict2items }}"
   loop_control:
     label: "{{ dest }}"
-  template:
+  ansible.builtin.template:
     src: systemd/restic-backup.service
     dest: "{{ dest }}"
+    owner: root
+    group: "{{ root_group }}"
+    mode: "0644"
 
 - name: Template systemd timers for Restic backups
   vars:
     dest: "/etc/systemd/system/restic-backup-{{ item.key }}.timer"
     restic_config: "{{ item.value }}"
-  loop: "{{ restic.config|dict2items }}"
+  loop: "{{ restic.config | dict2items }}"
   loop_control:
     label: "{{ dest }}"
-  template:
+  ansible.builtin.template:
     src: systemd/restic-backup.timer
     dest: "{{ dest }}"
+    owner: root
+    group: "{{ root_group }}"
+    mode: "0644"
   register: restic_template_systemd_backup_timers_result
 
 - name: Enable and start systemd timers for Restic backups
-  loop: "{{ restic_template_systemd_backup_timers_result.results|map(attribute='invocation.module_args.dest')|map('basename')|list }}"
-  systemd:
+  loop: "{{ restic_template_systemd_backup_timers_result.results | map(attribute='invocation.module_args.dest') | map('basename') | list }}"
+  ansible.builtin.systemd:
     daemon_reload: yes
     name: "{{ item }}"
     enabled: yes

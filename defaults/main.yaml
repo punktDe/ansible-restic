@@ -1,4 +1,14 @@
+root_group: >-
+  {%- if ansible_os_family == 'Debian' -%}
+    root
+  {%- else -%}
+    wheel
+  {%- endif -%}
 restic:
+  cache_cleanup:
+    schedule: "*-*-* 06:21:00"
+    enabled: no
+    delete_older_than: # days
   prefix:
     bin: >-
       {%- if ansible_system == 'Linux' -%}
