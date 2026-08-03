@@ -4,4 +4,4 @@
   tasks:
     - name: "Include ansible-restic"
       ansible.builtin.include_role:
-        name: "ansible-restic"
+        name: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}"
