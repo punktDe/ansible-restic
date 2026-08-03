@@ -25,12 +25,13 @@
     owner: root
     group: "{{ root_group }}"
     mode: "0644"
-  register: restic_template_systemd_backup_timers_result
 
 - name: Enable and start systemd timers for Restic backups
-  loop: "{{ restic_template_systemd_backup_timers_result.results | map(attribute='invocation.module_args.dest') | map('basename') | list }}"
+  loop: "{{ restic.config.keys() }}"
+  loop_control:
+    label: "restic-backup-{{ item }}.timer"
   ansible.builtin.systemd:
     daemon_reload: yes
-    name: "{{ item }}"
+    name: "restic-backup-{{ item }}.timer"
     enabled: yes
     state: started
