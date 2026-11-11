@@ -1,2 +1,2 @@
 #!/bin/sh
-find {{ restic.prefix.cache }} -atime +{{ restic.cache_cleanup.delete_older_than }} | xargs rm
+find {{ restic.prefix.cache }} -type f -atime +{{ restic.cache_cleanup.delete_older_than }} -delete
